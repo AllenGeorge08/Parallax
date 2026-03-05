@@ -1,6 +1,7 @@
 use litesvm::LiteSVM;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
+use solana_sdk::native_token::LAMPORTS_PER_SOL;
 use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::sysvar::clock::Clock;
 use solana_sdk::{system_instruction, transaction::Transaction};
@@ -35,12 +36,16 @@ impl<'a> TestHarness<'a> {
         println!("Oracle Program deployed succesfully");
     }
 
-    pub fn send_tx(&mut self, to: Keypair, lamports: u64) {
+    pub fn send_tx(&mut self, to: &Keypair, lamports: u64) {
         let payer = &self.payer;
         let payer_pubkey = payer.pubkey();
         let receiver_pubkey = to.pubkey();
 
-        let transfer_ix = system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports);
+        self.svm
+            .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000);
+
+        let transfer_ix =
+            system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
 
         let tx = Transaction::new_signed_with_payer(
             &[transfer_ix],
@@ -50,7 +55,7 @@ impl<'a> TestHarness<'a> {
         );
 
         let result = self.svm.send_transaction(tx).unwrap();
-        println!("Tx finalized: {:?}", result);
+        println!("Tx finalized: {:?}", result.pretty_logs());
     }
 
     pub fn warp_to_slot(&mut self, slot: u64) {
