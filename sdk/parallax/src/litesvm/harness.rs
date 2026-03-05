@@ -28,7 +28,7 @@ impl<'a> TestHarness<'a> {
 
     pub fn deploy_program(&mut self) {
         let program_keypair =
-            read_keypair_file("../../../../oracle/target/deploy/oracle-keypair.json")
+            read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
                 .expect("Failed to get keypair");
         let program_id: Pubkey = program_keypair.pubkey();
         let program_bytes = include_bytes!("../../../../oracle/target/deploy/oracle.so");

@@ -35,3 +35,12 @@ pub fn test_send_tx() {
         Some(20_000_000_000)
     );
 }
+
+#[test]
+pub fn test_deploy(){
+    let payer = Keypair::new();
+
+    let mut harness = TestHarness::new(&payer);
+
+    harness.deploy_program();
+}
