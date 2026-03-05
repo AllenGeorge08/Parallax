@@ -2,15 +2,23 @@ use litesvm::LiteSVM;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
 use solana_sdk::signature::{Signer, read_keypair_file};
+use solana_sdk::sysvar::clock::Clock;
 use solana_sdk::{system_instruction, transaction::Transaction};
+use std::fmt;
 
-pub struct TestHarness {
+pub struct TestHarness<'a> {
     pub svm: LiteSVM,
-    pub payer: Keypair,
+    pub payer: &'a Keypair,
 }
 
-impl TestHarness {
-    pub fn new(payer: Keypair) -> Self {
+impl<'a> fmt::Display for TestHarness<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, " ")
+    }
+}
+
+impl<'a> TestHarness<'a> {
+    pub fn new(payer: &'a Keypair) -> Self {
         Self {
             svm: LiteSVM::new(),
             payer,
@@ -46,11 +54,15 @@ impl TestHarness {
     }
 
     pub fn warp_to_slot(&mut self, slot: u64) {
+        let clock: Clock = self.svm.get_sysvar();
+        println!("Slot before warping: {}", clock.slot);
         self.svm.warp_to_slot(slot);
+        let clock: Clock = self.svm.get_sysvar();
         println!("Warped to slot: {:?}", slot);
+        println!("Slot after warping: {}", clock.slot);
     }
 
-    pub fn get_account(&mut self, pubkey: Pubkey) -> Pubkey{
-        self.svm.get_account(&pubkey).unwrap()
+    pub fn get_account(&mut self, pubkey: Pubkey) {
+        self.svm.get_account(&pubkey).unwrap();
     }
 }
