@@ -44,3 +44,15 @@ pub fn test_deploy(){
 
     harness.deploy_program();
 }
+
+#[test]
+pub fn test_get_account(){
+    let payer = Keypair::new();
+
+    let mut harness = TestHarness::new(&payer);
+
+    harness.send_tx(&payer, 5);
+    let account = harness.get_account(payer.pubkey());
+    println!("Account for pubkey: {:?} : \n {:#?}", payer.pubkey(),account);
+
+}

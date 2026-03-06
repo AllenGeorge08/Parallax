@@ -1,11 +1,11 @@
 use litesvm::LiteSVM;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
-use solana_sdk::native_token::LAMPORTS_PER_SOL;
 use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::sysvar::clock::Clock;
 use solana_sdk::{system_instruction, transaction::Transaction};
-use std::fmt;
+use std::fmt::{self, format};
+use solana_account::Account;
 
 pub struct TestHarness<'a> {
     pub svm: LiteSVM,
@@ -42,7 +42,7 @@ impl<'a> TestHarness<'a> {
         let receiver_pubkey = to.pubkey();
 
         self.svm
-            .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000);
+            .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000).map_err(|err| println!("Failed Airdrop: {:?}",err));
 
         let transfer_ix =
             system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
@@ -67,7 +67,7 @@ impl<'a> TestHarness<'a> {
         println!("Slot after warping: {}", clock.slot);
     }
 
-    pub fn get_account(&mut self, pubkey: Pubkey) {
-        self.svm.get_account(&pubkey).unwrap();
+    pub fn get_account(&mut self, pubkey: Pubkey) -> Account{
+        self.svm.get_account(&pubkey).unwrap()
     }
 }
