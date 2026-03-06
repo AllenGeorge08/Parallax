@@ -37,7 +37,7 @@ pub fn test_send_tx() {
 }
 
 #[test]
-pub fn test_deploy(){
+pub fn test_deploy() {
     let payer = Keypair::new();
 
     let mut harness = TestHarness::new(&payer);
@@ -46,13 +46,16 @@ pub fn test_deploy(){
 }
 
 #[test]
-pub fn test_get_account(){
+pub fn test_get_account() {
     let payer = Keypair::new();
 
     let mut harness = TestHarness::new(&payer);
 
     harness.send_tx(&payer, 5);
     let account = harness.get_account(payer.pubkey());
-    println!("Account for pubkey: {:?} : \n {:#?}", payer.pubkey(),account);
-
+    println!(
+        "Account for pubkey: {:?} : \n {:#?}",
+        payer.pubkey(),
+        account
+    );
 }

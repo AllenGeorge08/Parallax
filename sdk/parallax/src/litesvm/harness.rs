@@ -1,11 +1,11 @@
 use litesvm::LiteSVM;
+use solana_account::Account;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
 use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::sysvar::clock::Clock;
 use solana_sdk::{system_instruction, transaction::Transaction};
 use std::fmt::{self, format};
-use solana_account::Account;
 
 pub struct TestHarness<'a> {
     pub svm: LiteSVM,
@@ -27,9 +27,8 @@ impl<'a> TestHarness<'a> {
     }
 
     pub fn deploy_program(&mut self) {
-        let program_keypair =
-            read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
-                .expect("Failed to get keypair");
+        let program_keypair = read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
+            .expect("Failed to get keypair");
         let program_id: Pubkey = program_keypair.pubkey();
         let program_bytes = include_bytes!("../../../../oracle/target/deploy/oracle.so");
         self.svm.add_program(program_id, program_bytes);
@@ -42,7 +41,8 @@ impl<'a> TestHarness<'a> {
         let receiver_pubkey = to.pubkey();
 
         self.svm
-            .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000).map_err(|err| println!("Failed Airdrop: {:?}",err));
+            .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000)
+            .map_err(|err| println!("Failed Airdrop: {:?}", err));
 
         let transfer_ix =
             system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
@@ -59,15 +59,10 @@ impl<'a> TestHarness<'a> {
     }
 
     pub fn warp_to_slot(&mut self, slot: u64) {
-        let clock: Clock = self.svm.get_sysvar();
-        println!("Slot before warping: {}", clock.slot);
         self.svm.warp_to_slot(slot);
-        let clock: Clock = self.svm.get_sysvar();
-        println!("Warped to slot: {:?}", slot);
-        println!("Slot after warping: {}", clock.slot);
-    }
+      }
 
-    pub fn get_account(&mut self, pubkey: Pubkey) -> Account{
+    pub fn get_account(&mut self, pubkey: Pubkey) -> Account {
         self.svm.get_account(&pubkey).unwrap()
     }
 }
