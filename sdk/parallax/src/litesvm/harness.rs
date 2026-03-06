@@ -2,10 +2,10 @@ use litesvm::LiteSVM;
 use solana_account::Account;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
+use solana_sdk::clock::Clock;
 use solana_sdk::signature::{Signer, read_keypair_file};
-use solana_sdk::sysvar::clock::Clock;
 use solana_sdk::{system_instruction, transaction::Transaction};
-use std::fmt::{self, format};
+use std::fmt::{self};
 
 pub struct TestHarness<'a> {
     pub svm: LiteSVM,
@@ -60,9 +60,21 @@ impl<'a> TestHarness<'a> {
 
     pub fn warp_to_slot(&mut self, slot: u64) {
         self.svm.warp_to_slot(slot);
-      }
+    }
 
     pub fn get_account(&mut self, pubkey: Pubkey) -> Account {
         self.svm.get_account(&pubkey).unwrap()
+    }
+
+    pub fn get_current_slot(&mut self) -> u64 {
+        let clock: Clock = self.svm.get_sysvar();
+        let slot = clock.slot;
+        slot
+    }
+
+    pub fn get_current_epoch(&mut self) -> u64 {
+        let clock: Clock = self.svm.get_sysvar();
+        let epoch = clock.epoch;
+        epoch
     }
 }

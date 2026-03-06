@@ -5,7 +5,7 @@ use solana_sdk::signature::Signer;
 use solana_sdk::sysvar::clock::Clock;
 
 #[test]
-pub fn test_timecontroller_initializes(){
+pub fn test_timecontroller_initializes() {
     let payer = Keypair::new();
 
     let mut harness = TestHarness::new(&payer);
@@ -14,13 +14,11 @@ pub fn test_timecontroller_initializes(){
 
     let current_slot = controller.current_slot();
     println!("Controller Initialized succesfully..");
-    println!("Current slot: {:?}",current_slot);
+    println!("Current slot: {:?}", current_slot);
 }
 
-
 #[test]
-pub fn test_advance_to_slot(){
-
+pub fn test_advance_to_slot() {
     let payer = Keypair::new();
 
     let mut harness = TestHarness::new(&payer);
@@ -29,19 +27,19 @@ pub fn test_advance_to_slot(){
 
     let current_slot = controller.current_slot();
 
-    println!("Current slot is: {:?}",current_slot);
+    println!("Current slot is: {:?}", current_slot);
 
     controller.advance_to_slot(450000000000000);
 
     let current_slot = controller.current_slot();
+    assert_eq!(current_slot, 450000000000000);
 
-    println!("Current slot after warping is : {:?}",current_slot);
+    println!("Current slot after warping is : {:?}", current_slot);
     println!("Advance To Slot working succesfully...");
 }
 
 #[test]
-pub fn test_advance_to_epoch(){
-
+pub fn test_advance_to_epoch() {
     let payer = Keypair::new();
 
     let mut harness = TestHarness::new(&payer);
@@ -50,16 +48,17 @@ pub fn test_advance_to_epoch(){
 
     let current_epoch = controller.current_epoch();
 
-    println!("Current slot is: {:?}",current_epoch);
+    println!("Current slot is: {:?}", current_epoch);
 
     controller.advance_to_epoch(450000);
 
     let current_epoch = controller.current_epoch();
     let current_slot = controller.current_slot();
 
-    println!("Current epoch after warping is : {:?}",current_epoch);
+    assert_eq!(current_epoch, 450000);
+
+    println!("Current epoch after warping is : {:?}", current_epoch);
     println!("Advance To epoch working succesfully...");
 
-    println!("Current slot after warping epoch is: {:?}",current_slot);
+    println!("Current slot after warping epoch is: {:?}", current_slot);
 }
-
