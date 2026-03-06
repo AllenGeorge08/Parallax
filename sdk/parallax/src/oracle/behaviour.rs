@@ -1,9 +1,11 @@
 use crate::litesvm::harness::TestHarness;
+use anchor_lang::AccountDeserialize;
 use anchor_lang::{InstructionData, ToAccountMetas};
 use oracle::accounts::Initialize;
 use oracle::accounts::SetPrice;
 use oracle::instruction::Initialize as Initialize_Ix;
 use oracle::instruction::SetPrice as SetPrice_Ix;
+use oracle::state::Oracle;
 use solana_instruction::Instruction;
 use solana_message::Message;
 use solana_pubkey::Pubkey;
@@ -124,4 +126,14 @@ impl<'a> OracleBehaviour<'a> {
         self.harness.warp_to_slot(current_slot + slots);
         self.set_price(to, price_exponent, confidence);
     }
+
+
+    pub fn read_oracle(&mut self) -> (i32,i64){
+        let account = self.harness.svm.get_account(&self.oracle_account).unwrap();
+
+        let oracle: Oracle = Oracle::try_deserialize(&mut account.data.as_slice()).unwrap();
+
+        (oracle.price_exponent,oracle.price_mantissa)
+    }
+
 }
