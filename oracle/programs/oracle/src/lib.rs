@@ -32,12 +32,14 @@ pub mod oracle {
 
     pub fn set_price(
         ctx: Context<SetPrice>,
+        seed: u64,
         price_mantissa: i64,
         price_exponent: i32,
         confidence: u64,
+       
     ) -> Result<()> {
         ctx.accounts
-            .set_prices(price_mantissa, price_exponent, confidence)?;
+            .set_prices(seed,price_mantissa, price_exponent, confidence)?;
         msg!("Updated prices");
 
         Ok(())

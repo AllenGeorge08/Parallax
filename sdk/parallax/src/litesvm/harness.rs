@@ -7,6 +7,7 @@ use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::{system_instruction, transaction::Transaction};
 use std::fmt::{self};
 
+#[derive(Clone)]
 pub struct TestHarness<'a> {
     pub svm: LiteSVM,
     pub payer: &'a Keypair,

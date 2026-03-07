@@ -68,7 +68,7 @@ impl<'a> OracleBehaviour<'a> {
         );
     }
 
-    pub fn set_price(&mut self, price_mantissa: i64, price_exponent: i32, confidence: u64) {
+    pub fn set_price(&mut self, price_mantissa: i64, price_exponent: i32, confidence: u64,seed: u64) {
         let set_price_ix = Instruction {
             program_id: oracle::ID,
             accounts: SetPrice {
@@ -78,9 +78,10 @@ impl<'a> OracleBehaviour<'a> {
             }
             .to_account_metas(None),
             data: SetPrice_Ix {
+                seed: seed,
                 price_exponent: price_exponent,
                 price_mantissa: price_mantissa,
-                confidence: confidence,
+                confidence: confidence,                
             }
             .data(),
         };
@@ -119,21 +120,21 @@ impl<'a> OracleBehaviour<'a> {
         slots: u64,
         confidence: u64,
         price_exponent: i32,
+        seed: u64
     ) {
-        self.set_price(from, price_exponent, confidence);
+        self.set_price(from, price_exponent, confidence,seed);
         let current_slot = self.harness.get_current_slot();
 
         self.harness.warp_to_slot(current_slot + slots);
-        self.set_price(to, price_exponent, confidence);
+        self.set_price(to, price_exponent, confidence,seed);
     }
 
-
-    pub fn read_oracle(&mut self) -> (i32,i64){
+    pub fn read_oracle(&mut self) -> (i32, i64) {
         let account = self.harness.svm.get_account(&self.oracle_account).unwrap();
 
         let oracle: Oracle = Oracle::try_deserialize(&mut account.data.as_slice()).unwrap();
+    
 
-        (oracle.price_exponent,oracle.price_mantissa)
+        (oracle.price_exponent, oracle.price_mantissa)
     }
-
 }
