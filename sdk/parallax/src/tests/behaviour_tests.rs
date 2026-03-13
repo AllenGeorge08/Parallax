@@ -54,7 +54,7 @@ pub fn test_price_crash() {
     let (initial_exponent, initial_mantissa) = oracle_behaviour_account.read_oracle();
     println!("Initial Exponent: {:?}", initial_exponent);
     println!("Initial Mantissa Before Crash: {:?}", initial_mantissa);
-    oracle_behaviour_account.price_crash(1500000, 100000, 2, 2, -3,1);
+    oracle_behaviour_account.price_crash(1500000, 100000, 2, 2, -3, 1);
 
     let (final_exponent, final_mantissa) = oracle_behaviour_account.read_oracle();
     println!("Final Exponent: {:?}", final_exponent);

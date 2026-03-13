@@ -19,11 +19,10 @@ pub struct SetPrice<'info> {
 impl<'info> SetPrice<'info> {
     pub fn set_prices(
         &mut self,
-         seed: u64,
+        seed: u64,
         price_mantissa: i64,
         price_exponent: i32,
         confidence: u64,
-       
     ) -> Result<()> {
         assert_eq!(
             self.authority.key(),

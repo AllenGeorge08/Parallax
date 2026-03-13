@@ -7,6 +7,7 @@ use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::{system_instruction, transaction::Transaction};
 use std::fmt::{self};
 use std::fs;
+use std::path::Path;
 
 #[derive(Clone)]
 pub struct TestHarness<'a> {
@@ -31,13 +32,24 @@ impl<'a> TestHarness<'a> {
     pub fn deploy_program(&mut self) {
         let program_keypair = read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
             .expect("Failed to get keypair");
-        let program_id: Pubkey = program_keypair.pubkey();
-        // let program_bytes = include_bytes!("../../../../oracle/target/deploy/oracle.so");
-        // self.svm.add_program(program_id, program_bytes);
-        let program_bytes = fs::read("../../oracle/target/deploy/oracle.so").expect("Failed to read oracle program binary. Build it first with anchor build.");
-        self.svm.add_program(program_id, &program_bytes);
+        self.deploy_program_from(
+            "../../oracle/target/deploy/oracle-keypair.json",
+            "../../oracle/target/deploy/oracle.so",
+        );
+    }
 
-        println!("Oracle Program deployed succesfully");
+    pub fn deploy_program_from(
+        &mut self,
+        keypair_path: impl AsRef<Path>,
+        program_path: impl AsRef<Path>,
+    ) {
+        let program_keypair = read_keypair_file(keypair_path)
+            .expect("Failed to read oracle program keypair. Check the provided path.");
+        let program_id = program_keypair.pubkey();
+        let program_bytes = fs::read(program_path)
+            .expect("Failed to read oracle program binary. Build it first with `anchor build`.");
+        self.svm.add_program(program_id, &program_bytes);
+        println!("Oracle program deployed succesfully...");
     }
 
     pub fn send_tx(&mut self, to: &Keypair, lamports: u64) {
