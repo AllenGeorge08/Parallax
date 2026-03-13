@@ -6,6 +6,7 @@ use solana_sdk::clock::Clock;
 use solana_sdk::signature::{Signer, read_keypair_file};
 use solana_sdk::{system_instruction, transaction::Transaction};
 use std::fmt::{self};
+use std::fs;
 
 #[derive(Clone)]
 pub struct TestHarness<'a> {
@@ -31,8 +32,11 @@ impl<'a> TestHarness<'a> {
         let program_keypair = read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
             .expect("Failed to get keypair");
         let program_id: Pubkey = program_keypair.pubkey();
-        let program_bytes = include_bytes!("../../../../oracle/target/deploy/oracle.so");
-        self.svm.add_program(program_id, program_bytes);
+        // let program_bytes = include_bytes!("../../../../oracle/target/deploy/oracle.so");
+        // self.svm.add_program(program_id, program_bytes);
+        let program_bytes = fs::read("../../oracle/target/deploy/oracle.so").expect("Failed to read oracle program binary. Build it first with anchor build.");
+        self.svm.add_program(program_id, &program_bytes);
+
         println!("Oracle Program deployed succesfully");
     }
 
@@ -48,7 +52,7 @@ impl<'a> TestHarness<'a> {
         let transfer_ix =
             system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
 
-        let tx = Transaction::new_signed_with_payer(
+        let tx: Transaction = Transaction::new_signed_with_payer(
             &[transfer_ix],
             Some(&payer_pubkey),
             &[&payer],
