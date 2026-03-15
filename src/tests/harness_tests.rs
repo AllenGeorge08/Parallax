@@ -1,7 +1,7 @@
 use crate::litesvm::harness::TestHarness;
 use solana_keypair::Keypair;
-use solana_sdk::signature::Signer;
-use solana_sdk::sysvar::clock::Clock;
+use solana_signer::Signer;
+use solana_clock::Clock;
 
 #[test]
 pub fn test_harness_initializes() {

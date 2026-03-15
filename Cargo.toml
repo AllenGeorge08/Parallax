@@ -19,7 +19,9 @@ solana-sdk-ids = "2.2.1"
 solana-rpc-client = "3.0.3"
 solana-address = "1.0.0"
 solana-account = "2.2.1"
-solana-sdk = "2.2"
+solana-clock = "2.2.1"
+darling = "=0.20.10"
+serde_with = "=3.11.0"
 
 oracle = {path = "oracle/programs/oracle"}
 anchor-lang = { version = "0.31.1", features = ["derive", "init-if-needed"] }

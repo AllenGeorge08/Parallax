@@ -1,4 +1,5 @@
-use solana_sdk::clock::Clock;
+// use solana_sdk::clock::Clock;
+use solana_clock::Clock;
 
 use crate::litesvm::harness::TestHarness;
 

@@ -9,8 +9,8 @@ use oracle::state::Oracle;
 use solana_instruction::Instruction;
 use solana_message::Message;
 use solana_pubkey::Pubkey;
-use solana_sdk::signature::Signer;
-use solana_sdk::system_program;
+use solana_signer::Signer;
+use solana_sdk_ids::system_program;
 use solana_transaction::Transaction;
 // use solana_sdk::pubkey::Pubkey;
 
