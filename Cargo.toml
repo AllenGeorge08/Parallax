@@ -1,0 +1,3 @@
+[workspace]
+members = ["sdk/parallax"]
+resolver = "2"
