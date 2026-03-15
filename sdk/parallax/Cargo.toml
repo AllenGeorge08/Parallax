@@ -21,5 +21,5 @@ solana-address = "1.0.0"
 solana-account = "2.2.1"
 solana-sdk = "2.2"
 
-oracle = {path = "../../oracle/programs/oracle"}
+oracle = {path = "oracle/programs/oracle"}
 anchor-lang = { version = "0.31.1", features = ["derive", "init-if-needed"] }

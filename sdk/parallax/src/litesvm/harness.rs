@@ -30,11 +30,11 @@ impl<'a> TestHarness<'a> {
     }
 
     pub fn deploy_program(&mut self) {
-        let program_keypair = read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
-            .expect("Failed to get keypair");
+        // let program_keypair = read_keypair_file("../../../oracle/target/deploy/oracle-keypair.json")
+        //     .expect("Failed to get keypair");
         self.deploy_program_from(
-            "../../oracle/target/deploy/oracle-keypair.json",
-            "../../oracle/target/deploy/oracle.so",
+            "oracle/target/deploy/oracle-keypair.json",
+            "oracle/target/deploy/oracle.so",
         );
     }
 
