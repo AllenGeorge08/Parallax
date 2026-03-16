@@ -2091,6 +2091,7 @@ dependencies = [
  "solana-keypair",
  "solana-message",
  "solana-native-token",
+ "solana-program-runtime",
  "solana-pubkey",
  "solana-sdk",
  "solana-sdk-ids",

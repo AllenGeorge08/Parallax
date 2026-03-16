@@ -20,7 +20,4 @@ solana-sdk-ids = "2.2.1"
 solana-address = "1.0.0"
 solana-account = "2.2.1"
 solana-sdk = "2.2"
-
-
-
-
+solana-program-runtime = "=2.2.4"
