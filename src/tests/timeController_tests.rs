@@ -2,7 +2,7 @@ use crate::litesvm::harness::TestHarness;
 use crate::timecontroller::{TimeController, controller};
 use solana_keypair::Keypair;
 use solana_signer::Signer;
-use solana_clock::Clock;
+use solana_sdk::clock::Clock;
 
 #[test]
 pub fn test_timecontroller_initializes() {
