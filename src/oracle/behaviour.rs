@@ -13,7 +13,6 @@ use solana_sdk_ids::system_program;
 use solana_signer::Signer;
 use solana_transaction::Transaction;
 
-
 pub struct OracleBehaviour<'a> {
     pub harness: &'a mut TestHarness<'a>,
     pub oracle_account: Pubkey,
@@ -110,8 +109,10 @@ impl<'a> OracleBehaviour<'a> {
     pub fn derive_oracle_pda(seed: u64) -> (Pubkey, u8) {
         // let program_id = oracle::ID;
 
-        let (pda, bump) =
-            Pubkey::find_program_address(&[b"oracle", seed.to_le_bytes().as_ref()], &oracle::ID.to_bytes().into());
+        let (pda, bump) = Pubkey::find_program_address(
+            &[b"oracle", seed.to_le_bytes().as_ref()],
+            &oracle::ID.to_bytes().into(),
+        );
 
         println!("The pda is: {:?}", pda);
         println!("The bump is: {:?}", bump);

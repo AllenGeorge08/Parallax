@@ -4,8 +4,8 @@ use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
 use solana_sdk::clock::Clock;
 // use solana_sdk::signature::{Signer, read_keypair_file};
-use solana_signer::Signer;
 use solana_keypair::read_keypair_file;
+use solana_signer::Signer;
 use solana_system_interface::instruction::transfer;
 use solana_transaction::Transaction;
 use std::fmt::{self};
@@ -32,14 +32,22 @@ impl<'a> TestHarness<'a> {
         }
     }
 
+  
     pub fn deploy_program(&mut self) {
-        // let program_keypair = read_keypair_file("../../../oracle/target/deploy/oracle-keypair.json")
-        //     .expect("Failed to get keypair");
-        self.deploy_program_from(
-            "artifacts/oracle-keypair.json",
-            "artifacts/oracle.so",
-        );
-    }
+    let keypair_bytes = include_bytes!("../../artifacts/oracle-keypair.json");
+    let program_bytes = include_bytes!("../../artifacts/oracle.so");
+
+    let secret_key: Vec<u8> = serde_json::from_slice(keypair_bytes)
+        .expect("Failed to parse oracle keypair JSON");
+    let program_keypair = Keypair::from_bytes(&secret_key)
+        .expect("Failed to create keypair from bytes");
+
+    let program_id = program_keypair.pubkey();
+    self.svm.add_program(program_id, program_bytes);
+    println!("Oracle program deployed successfully...");
+}
+
+    
 
     pub fn deploy_program_from(
         &mut self,
@@ -64,8 +72,7 @@ impl<'a> TestHarness<'a> {
             .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000)
             .map_err(|err| println!("Failed Airdrop: {:?}", err));
 
-        let transfer_ix =
-            transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
+        let transfer_ix = transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
 
         let tx: Transaction = Transaction::new_signed_with_payer(
             &[transfer_ix],
