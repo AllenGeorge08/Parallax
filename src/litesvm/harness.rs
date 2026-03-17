@@ -36,8 +36,8 @@ impl<'a> TestHarness<'a> {
         // let program_keypair = read_keypair_file("../../../oracle/target/deploy/oracle-keypair.json")
         //     .expect("Failed to get keypair");
         self.deploy_program_from(
-            "oracle/target/deploy/oracle-keypair.json",
-            "oracle/target/deploy/oracle.so",
+            "artifacts/oracle-keypair.json",
+            "artifacts/oracle.so",
         );
     }
 
