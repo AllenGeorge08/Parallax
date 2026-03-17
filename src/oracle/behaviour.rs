@@ -9,10 +9,10 @@ use oracle::state::Oracle;
 use solana_instruction::Instruction;
 use solana_message::Message;
 use solana_pubkey::Pubkey;
-use solana_sdk::signature::Signer;
-use solana_sdk::system_program;
+use solana_sdk_ids::system_program;
+use solana_signer::Signer;
 use solana_transaction::Transaction;
-// use solana_sdk::pubkey::Pubkey;
+
 
 pub struct OracleBehaviour<'a> {
     pub harness: &'a mut TestHarness<'a>,
@@ -36,7 +36,7 @@ impl<'a> OracleBehaviour<'a> {
         is_valid: bool,
     ) {
         let initialize_ix = Instruction {
-            program_id: oracle::ID,
+            program_id: oracle::ID.to_bytes().into(),
             accounts: Initialize {
                 authority: self.harness.payer.pubkey(),
                 oracle: self.oracle_account,
@@ -76,7 +76,7 @@ impl<'a> OracleBehaviour<'a> {
         seed: u64,
     ) {
         let set_price_ix = Instruction {
-            program_id: oracle::ID,
+            program_id: oracle::ID.to_bytes().into(),
             accounts: SetPrice {
                 authority: self.harness.payer.pubkey(),
                 oracle: self.oracle_account,
@@ -108,10 +108,10 @@ impl<'a> OracleBehaviour<'a> {
     }
 
     pub fn derive_oracle_pda(seed: u64) -> (Pubkey, u8) {
-        let program_id = oracle::ID;
+        // let program_id = oracle::ID;
 
         let (pda, bump) =
-            Pubkey::find_program_address(&[b"oracle", seed.to_le_bytes().as_ref()], &program_id);
+            Pubkey::find_program_address(&[b"oracle", seed.to_le_bytes().as_ref()], &oracle::ID.to_bytes().into());
 
         println!("The pda is: {:?}", pda);
         println!("The bump is: {:?}", bump);

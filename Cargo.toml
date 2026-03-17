@@ -1,5 +1,23 @@
-[workspace]
-members = [
-    "sdk/parallax"
-]
-resolver = "3"
+[package]
+name = "parallax"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+oracle = { path = "oracle/programs/oracle" }
+anchor-lang = { version = "0.31.1", features = ["derive", "init-if-needed"] }
+litesvm = "0.6.1"
+litesvm-token = "0.6.1"
+solana-instruction = "2.2.1"
+solana-keypair = "2.2.1"
+solana-native-token = "2.2.1"
+solana-pubkey = "2.2.1"
+solana-signer = "2.2.1"
+solana-system-interface = "1.0.0"
+solana-transaction = "2.2.1"
+solana-message = "2.2.1"
+solana-sdk-ids = "2.2.1"
+solana-address = "1.0.0"
+solana-account = "2.2.1"
+solana-sdk = "2.2"
+solana-program-runtime = "=2.2.4"

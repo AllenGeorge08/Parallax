@@ -3,8 +3,11 @@ use solana_account::Account;
 use solana_keypair::Keypair;
 use solana_pubkey::Pubkey;
 use solana_sdk::clock::Clock;
-use solana_sdk::signature::{Signer, read_keypair_file};
-use solana_sdk::{system_instruction, transaction::Transaction};
+// use solana_sdk::signature::{Signer, read_keypair_file};
+use solana_signer::Signer;
+use solana_keypair::read_keypair_file;
+use solana_system_interface::instruction::transfer;
+use solana_transaction::Transaction;
 use std::fmt::{self};
 use std::fs;
 use std::path::Path;
@@ -30,11 +33,11 @@ impl<'a> TestHarness<'a> {
     }
 
     pub fn deploy_program(&mut self) {
-        let program_keypair = read_keypair_file("../../oracle/target/deploy/oracle-keypair.json")
-            .expect("Failed to get keypair");
+        // let program_keypair = read_keypair_file("../../../oracle/target/deploy/oracle-keypair.json")
+        //     .expect("Failed to get keypair");
         self.deploy_program_from(
-            "../../oracle/target/deploy/oracle-keypair.json",
-            "../../oracle/target/deploy/oracle.so",
+            "artifacts/oracle-keypair.json",
+            "artifacts/oracle.so",
         );
     }
 
@@ -62,7 +65,7 @@ impl<'a> TestHarness<'a> {
             .map_err(|err| println!("Failed Airdrop: {:?}", err));
 
         let transfer_ix =
-            system_instruction::transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
+            transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
 
         let tx: Transaction = Transaction::new_signed_with_payer(
             &[transfer_ix],
