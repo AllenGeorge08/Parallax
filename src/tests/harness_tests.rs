@@ -1,4 +1,4 @@
-use crate::litesvm::harness::TestHarness;
+use crate::{harness, litesvm::harness::TestHarness};
 use solana_keypair::Keypair;
 use solana_sdk::clock::Clock;
 use solana_signer::Signer;
@@ -58,4 +58,31 @@ pub fn test_get_account() {
         payer.pubkey(),
         account
     );
+}
+
+#[test]
+pub fn create_mint_and_ata() {
+    let payer = Keypair::new();
+    let mut harness = TestHarness::new(&payer);
+    harness.send_tx(&payer, 100);
+
+    let account = harness.get_account(payer.pubkey());
+    println!(
+        "Account for pubkey: {:?} : \n {:#?} with lamports: {:?}",
+        payer.pubkey(),
+        account,
+        account.lamports
+    );
+
+    let user_ata = Keypair::new();
+
+    let mint = harness.create_mint(&payer);
+
+    let mint_retrieved = harness.get_mint(&mint).unwrap_or_default();
+    println!("Mint Created: {}",mint_retrieved);
+
+    assert_eq!(mint,mint_retrieved);
+    
+    let ata = harness.create_ata(&payer, &user_ata, &mint);
+    println!("Ata created succesfully for user Account : {:?} : \n ATA:  {:?}",ata,user_ata.to_base58_string());
 }
