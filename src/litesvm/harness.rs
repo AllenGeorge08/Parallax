@@ -1,7 +1,9 @@
 use litesvm::LiteSVM;
 use litesvm_token::spl_token::state::Mint;
 use solana_account::Account;
+use solana_instruction::Instruction;
 use solana_keypair::Keypair;
+use solana_message::Message;
 use solana_pubkey::Pubkey;
 use solana_sdk::clock::Clock;
 // use solana_sdk::signature::{Signer, read_keypair_file};
@@ -37,6 +39,10 @@ impl<'a> TestHarness<'a> {
             payer,
             mint: Vec::new(),
         }
+    }
+
+    pub fn return_instance(&mut self) -> Self{
+        Self { svm: self.svm.clone(), payer: self.payer, mint: self.mint.clone()}
     }
 
     pub fn deploy_program(&mut self) {
@@ -141,5 +147,13 @@ impl<'a> TestHarness<'a> {
         let mint_account = self.get_mint(mint).unwrap_or_default();
         MintTo::new(&mut self.svm, &self.payer, &mint_account, &to, amount);
         println!("Succesfully minted to : {:?}", to);
+    }
+
+    pub fn send_instruction(&mut self,ix: Instruction,signers: &[&Keypair]){
+        let payer_pubkey = self.payer.pubkey();
+        let message = Message::new(&[ix],Some(&payer_pubkey));
+        let blockhash = self.svm.latest_blockhash();
+        let tx = Transaction::new(signers,message,blockhash);
+        self.svm.send_transaction(tx).unwrap_or_default();
     }
 }
