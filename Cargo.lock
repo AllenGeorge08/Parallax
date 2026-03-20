@@ -2085,6 +2085,8 @@ dependencies = [
  "litesvm",
  "litesvm-token",
  "oracle",
+ "serde",
+ "serde_json",
  "solana-account",
  "solana-address 1.1.0",
  "solana-instruction",

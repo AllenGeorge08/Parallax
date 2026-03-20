@@ -1,11 +1,18 @@
 use litesvm::LiteSVM;
+use litesvm_token::spl_token::state::Mint;
 use solana_account::Account;
+use solana_instruction::Instruction;
 use solana_keypair::Keypair;
+use solana_message::Message;
 use solana_pubkey::Pubkey;
 use solana_sdk::clock::Clock;
 // use solana_sdk::signature::{Signer, read_keypair_file};
-use solana_signer::Signer;
+use crate::errors::Errors;
+use litesvm_token::{
+    spl_token::ID as TOKEN_PROGRAM_ID, CreateAssociatedTokenAccount, CreateMint, MintTo,
+};
 use solana_keypair::read_keypair_file;
+use solana_signer::Signer;
 use solana_system_interface::instruction::transfer;
 use solana_transaction::Transaction;
 use std::fmt::{self};
@@ -16,6 +23,7 @@ use std::path::Path;
 pub struct TestHarness<'a> {
     pub svm: LiteSVM,
     pub payer: &'a Keypair,
+    pub mint: Vec<Option<Pubkey>>,
 }
 
 impl<'a> fmt::Display for TestHarness<'a> {
@@ -29,16 +37,26 @@ impl<'a> TestHarness<'a> {
         Self {
             svm: LiteSVM::new(),
             payer,
+            mint: Vec::new(),
         }
     }
 
+    pub fn return_instance(&mut self) -> Self{
+        Self { svm: self.svm.clone(), payer: self.payer, mint: self.mint.clone()}
+    }
+
     pub fn deploy_program(&mut self) {
-        // let program_keypair = read_keypair_file("../../../oracle/target/deploy/oracle-keypair.json")
-        //     .expect("Failed to get keypair");
-        self.deploy_program_from(
-            "artifacts/oracle-keypair.json",
-            "artifacts/oracle.so",
-        );
+        let keypair_bytes = include_bytes!("../../artifacts/oracle-keypair.json");
+        let program_bytes = include_bytes!("../../artifacts/oracle.so");
+
+        let secret_key: Vec<u8> =
+            serde_json::from_slice(keypair_bytes).expect("Failed to parse oracle keypair JSON");
+        let program_keypair =
+            Keypair::from_bytes(&secret_key).expect("Failed to create keypair from bytes");
+
+        let program_id = program_keypair.pubkey();
+        self.svm.add_program(program_id, program_bytes);
+        println!("Oracle program deployed successfully...");
     }
 
     pub fn deploy_program_from(
@@ -64,8 +82,7 @@ impl<'a> TestHarness<'a> {
             .airdrop(&payer_pubkey, (lamports + 1) * 1_000_000_000)
             .map_err(|err| println!("Failed Airdrop: {:?}", err));
 
-        let transfer_ix =
-            transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
+        let transfer_ix = transfer(&payer_pubkey, &receiver_pubkey, lamports * 1_000_000_000);
 
         let tx: Transaction = Transaction::new_signed_with_payer(
             &[transfer_ix],
@@ -96,5 +113,47 @@ impl<'a> TestHarness<'a> {
         let clock: Clock = self.svm.get_sysvar();
         let epoch = clock.epoch;
         epoch
+    }
+
+    pub fn create_mint(&mut self, payer: &'a Keypair) -> Pubkey {
+        let mint = CreateMint::new(&mut self.svm, payer)
+            .authority(&payer.pubkey())
+            .decimals(6)
+            .send()
+            .expect("Error creating mint");
+        self.mint.push(Some(mint));
+        mint
+    }
+
+    pub fn get_mint(&mut self, mint: &Pubkey) -> Result<Pubkey, Errors> {
+        if self.mint.contains(&Some(*mint)) {
+            Ok(*mint)
+        } else {
+            println!("Mint doesn't exist, create one using create_mint");
+            Err(Errors::MintNotFound)
+        }
+    }
+
+    pub fn create_ata(&mut self, payer: &Keypair, ata_owner: &Keypair, mint: &Pubkey) -> Pubkey {
+        let mint_ata = self.get_mint(mint).unwrap_or_default();
+        let ata = CreateAssociatedTokenAccount::new(&mut self.svm, &ata_owner, &mint_ata)
+            .owner(&ata_owner.pubkey())
+            .send()
+            .unwrap_or_default();
+        ata
+    }
+
+    pub fn mint_to(&mut self, to: Pubkey, amount: u64, mint: &Pubkey) {
+        let mint_account = self.get_mint(mint).unwrap_or_default();
+        MintTo::new(&mut self.svm, &self.payer, &mint_account, &to, amount);
+        println!("Succesfully minted to : {:?}", to);
+    }
+
+    pub fn send_instruction(&mut self,ix: Instruction,signers: &[&Keypair]){
+        let payer_pubkey = self.payer.pubkey();
+        let message = Message::new(&[ix],Some(&payer_pubkey));
+        let blockhash = self.svm.latest_blockhash();
+        let tx = Transaction::new(signers,message,blockhash);
+        self.svm.send_transaction(tx).unwrap_or_default();
     }
 }
