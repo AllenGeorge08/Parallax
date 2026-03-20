@@ -136,7 +136,7 @@ impl<'a> TestHarness<'a> {
 
     pub fn create_ata(&mut self, payer: &Keypair, ata_owner: &Keypair, mint: &Pubkey) -> Pubkey {
         let mint_ata = self.get_mint(mint).unwrap_or_default();
-        let ata = CreateAssociatedTokenAccount::new(&mut self.svm, &ata_owner, &mint_ata)
+        let ata = CreateAssociatedTokenAccount::new(&mut self.svm, &payer, &mint_ata)
             .owner(&ata_owner.pubkey())
             .send()
             .unwrap_or_default();
