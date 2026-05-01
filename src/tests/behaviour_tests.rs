@@ -21,6 +21,16 @@ pub fn test_oracle_behaviour_initialize() {
 }
 
 #[test]
+pub fn print_discriminator(){
+    use sha2::{Sha256,Digest};
+    let mut hasher = Sha256::new();
+    hasher.update(b"account:PriceUpdateV2");
+    let result = hasher.finalize();
+    println!("{:?}",result);
+}
+
+
+#[test]
 pub fn test_initialize_oracle() {
     let payer = Keypair::new();
 
