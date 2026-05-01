@@ -79,10 +79,14 @@ pub fn create_mint_and_ata() {
     let mint = harness.create_mint(&payer);
 
     let mint_retrieved = harness.get_mint(&mint).unwrap_or_default();
-    println!("Mint Created: {}",mint_retrieved);
+    println!("Mint Created: {}", mint_retrieved);
 
-    assert_eq!(mint,mint_retrieved);
-    
+    assert_eq!(mint, mint_retrieved);
+
     let ata = harness.create_ata(&payer, &user_ata, &mint);
-    println!("Ata created succesfully for user Account : {:?} : \n ATA:  {:?}",ata,user_ata.to_base58_string());
+    println!(
+        "Ata created succesfully for user Account : {:?} : \n ATA:  {:?}",
+        ata,
+        user_ata.to_base58_string()
+    );
 }

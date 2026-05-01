@@ -41,10 +41,15 @@ impl<'a> TestHarness<'a> {
         }
     }
 
-    pub fn return_instance(&mut self) -> Self{
-        Self { svm: self.svm.clone(), payer: self.payer, mint: self.mint.clone()}
+    pub fn return_instance(&mut self) -> Self {
+        Self {
+            svm: self.svm.clone(),
+            payer: self.payer,
+            mint: self.mint.clone(),
+        }
     }
 
+    //Deploying local oracle program
     pub fn deploy_program(&mut self) {
         let keypair_bytes = include_bytes!("../../artifacts/oracle-keypair.json");
         let program_bytes = include_bytes!("../../artifacts/oracle.so");
@@ -59,19 +64,19 @@ impl<'a> TestHarness<'a> {
         println!("Oracle program deployed successfully...");
     }
 
-    pub fn deploy_program_from(
-        &mut self,
-        keypair_path: impl AsRef<Path>,
-        program_path: impl AsRef<Path>,
-    ) {
-        let program_keypair = read_keypair_file(keypair_path)
-            .expect("Failed to read oracle program keypair. Check the provided path.");
-        let program_id = program_keypair.pubkey();
-        let program_bytes = fs::read(program_path)
-            .expect("Failed to read oracle program binary. Build it first with `anchor build`.");
-        self.svm.add_program(program_id, &program_bytes);
-        println!("Oracle program deployed succesfully...");
-    }
+    // pub fn deploy_program_from(
+    //     &mut self,
+    //     keypair_path: impl AsRef<Path>,
+    //     program_path: impl AsRef<Path>,
+    // ) {
+    //     let program_keypair = read_keypair_file(keypair_path)
+    //         .expect("Failed to read oracle program keypair. Check the provided path.");
+    //     let program_id = program_keypair.pubkey();
+    //     let program_bytes = fs::read(program_path)
+    //         .expect("Failed to read oracle program binary. Build it first with `anchor build`.");
+    //     self.svm.add_program(program_id, &program_bytes);
+    //     println!("Oracle program deployed succesfully...");
+    // }
 
     pub fn send_tx(&mut self, to: &Keypair, lamports: u64) {
         let payer = &self.payer;
@@ -149,11 +154,11 @@ impl<'a> TestHarness<'a> {
         println!("Succesfully minted to : {:?}", to);
     }
 
-    pub fn send_instruction(&mut self,ix: Instruction,signers: &[&Keypair]){
+    pub fn send_instruction(&mut self, ix: Instruction, signers: &[&Keypair]) {
         let payer_pubkey = self.payer.pubkey();
-        let message = Message::new(&[ix],Some(&payer_pubkey));
+        let message = Message::new(&[ix], Some(&payer_pubkey));
         let blockhash = self.svm.latest_blockhash();
-        let tx = Transaction::new(signers,message,blockhash);
+        let tx = Transaction::new(signers, message, blockhash);
         self.svm.send_transaction(tx).unwrap_or_default();
     }
 }
