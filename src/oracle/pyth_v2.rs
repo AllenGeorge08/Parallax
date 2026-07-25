@@ -77,7 +77,7 @@ impl PythV2Oracle {
         svm.set_account(
             self.price_update_keypair.pubkey(),
             Account {
-                lamports: 1_000_000_000,
+                lamports: 1_000_000_000,  //error?
                 data,
                 owner: PYTH_RECEIVER_PROGRAM_ID,
                 executable: false,

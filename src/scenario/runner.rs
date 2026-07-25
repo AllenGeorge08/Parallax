@@ -47,3 +47,8 @@ impl<P: ProtocolUnderTest> ScenarioRunner<P>{
     }
 
 }
+
+
+//Trait Protocol UnderTest -> Invoke (Yep).
+
+//Struct Scenario runner (Oracle,Protocol) ... impl ScenarioRunner(It has a )
